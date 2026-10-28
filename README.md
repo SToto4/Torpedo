@@ -26,7 +26,7 @@ A projekt gyökeréből egyetlen paranccsal telepíthető minden függőség:
 ```bash
 npm install
 
----
+```
 
 ## Futtatás
 
