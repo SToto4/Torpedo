@@ -1,4 +1,4 @@
-import { Coordinate, Ship, Board, ShotResult, GameState, Phase, Orientation, RngFunction } from './types';
+﻿import { Coordinate, Ship, Board, ShotResult, GameState, Phase, Orientation, RngFunction } from './types';
 
 export const BOARD_SIZE = 10;
 export const SHIP_SIZES = [5, 4, 3, 3, 2];
@@ -149,3 +149,6 @@ export function assertPhase(game: GameState, expected: Phase): void {
     throw new Error(`Invalid operation: game is in ${game.phase} phase, expected ${expected}`);
   }
 }
+
+
+

@@ -135,10 +135,12 @@ Ez a szakasz egy szándékosan bevitt hibát és annak javítását mutatja be, 
 az automatizált tesztek valóban kiszűrik a hibás viselkedést. A példa az **AC3** határérték-ellenőrzést
 célozza: a hajó akkor érvénytelen, ha bármelyik mezője kilóg a `0–9` tartományból.
 
-> Megjegyzés: az alábbi terminálkimenetek az `backend/` könyvtárban futtatott `npm test`
-> parancs reprezentatív kimenetei (Vitest). A hiba és a javítás a tényleges
-> `validateShipPlacement` függvényt és a meglévő AC3 teszteket érinti
-> (`backend/src/gameLogic.ts`, `backend/tests/game.test.ts`).
+A teljes tesztfutások **valódi** kimenetei itt találhatók:
+- **Hibás verzió (megbukó tesztek):** [`docs/test-evidence/01_buggy_run.txt`](docs/test-evidence/01_buggy_run.txt)
+- **Javított verzió (zöld tesztek):** [`docs/test-evidence/02_fixed_run.txt`](docs/test-evidence/02_fixed_run.txt)
+
+A hiba és a javítás a `validateShipPlacement` függvényt és a meglévő AC3 teszteket érinti
+(`backend/src/gameLogic.ts`, `backend/tests/game.test.ts`).
 
 ### A hiba: off-by-one a határérték-ellenőrzésben
 
@@ -168,59 +170,27 @@ if (x < 0 || x >= BOARD_SIZE || y < 0 || y >= BOARD_SIZE) {
 
 ### Megbukó tesztfutás a hiba jelenlétében
 
+A teljes kimenet: [`docs/test-evidence/01_buggy_run.txt`](docs/test-evidence/01_buggy_run.txt)
+
+Összefoglaló:
 ```text
-$ npm test
-
- RUN  v1.2.0 /Torpedo/backend
-
- ✓ AC1 – Normal ship placement (2)
- ✓ AC2 – Edge placement and adjacency (3)
- ❯ AC3 – Invalid placement (overflow and overlap) (6)
-   × should reject ship placement that extends outside the board (unit)
-   × should throw when placeShip extends outside the board
-   × should return 400 via API when ship extends outside the board
-
- FAIL  tests/game.test.ts > AC3 – Invalid placement > should reject ship placement that extends outside the board (unit)
-AssertionError: expected true to be false // Object.is equality
-
-- Expected
-+ Received
-
-- false
-+ true
-
- ❯ tests/game.test.ts:181:29
-    179|     const board = createEmptyBoard();
-    180|     const validation = validateShipPlacement(board, 3, { x: 8, y: 0 }, 'horizontal');
-    181|     expect(validation.valid).toBe(false);
-       |                             ^
-    182|     expect(validation.error).toBeDefined();
-
  Test Files  1 failed (1)
-      Tests  3 failed | 20 passed (23)
+      Tests  3 failed | 23 passed (26)
 ```
 
-A teszt pontosan azt fogja meg, amit az AC3 előír: a `(8,0)` kezdetű 3-as hajó elutasítását.
-A hibás `<= BOARD_SIZE` feltétel miatt a `validation.valid` tévesen `true`, ezért a teszt megbukik.
+A 3 megbukó teszt mind AC3-at célozza:
+- `should reject ship placement that extends outside the board (unit)` -> `expected true to be false`
+- `should throw when placeShip extends outside the board` -> `expected [Function] to throw an error`
+- `should return 400 via API when ship extends outside the board` -> `expected 200 to be 400`
 
 ### Sikeres tesztfutás a javítás után
 
+A teljes kimenet: [`docs/test-evidence/02_fixed_run.txt`](docs/test-evidence/02_fixed_run.txt)
+
+Összefoglaló:
 ```text
-$ npm test
-
- RUN  v1.2.0 /Torpedo/backend
-
- ✓ AC1 – Normal ship placement (2)
- ✓ AC2 – Edge placement and adjacency (3)
- ✓ AC3 – Invalid placement (overflow and overlap) (6)
- ✓ AC4 – Shooting, bonus shot, and bot response (4)
- ✓ AC4 (determinism) – Seedable bot RNG (3)
- ✓ AC5 – Last ship sunk, game over (1)
- ✓ AC6 – Invalid shots (duplicate and out of bounds) (4)
- ✓ AC7 – Phase violation (3)
-
  Test Files  1 passed (1)
-      Tests  23 passed (23)
+      Tests  26 passed (26)
 ```
 
 ### Gyökérok és miért elégíti ki az elfogadási feltételt

@@ -1,0 +1,76 @@
+# Hibás verzió – tesztfutás eredménye
+# Hiba: gameLogic.ts sor 26: `x > BOARD_SIZE` helyett `x >= BOARD_SIZE` kellene (off-by-one)
+# A hibás feltétel: if (x < 0 || x > BOARD_SIZE || y < 0 || y > BOARD_SIZE)
+# Ezzel a x=10 (pályán kívüli!) index érvényesnek számít, mert 10 > 10 = false.
+
+ RUN  v1.6.1 D:/Toto/5.felev/Szoft. MI tam/Torpedo/backend
+
+ ✓ tests/game.test.ts > AC1 – Normal ship placement > should place a size-4 ship at (2,2) horizontal and occupy the correct cells
+ ✓ tests/game.test.ts > AC1 – Normal ship placement > should place a ship via the API and return updated board
+ ✓ tests/game.test.ts > AC2 – Edge placement and adjacency > should allow placing a ship that ends exactly at the right edge
+ ✓ tests/game.test.ts > AC2 – Edge placement and adjacency > should allow placing a ship adjacent (touching) to an existing ship
+ ✓ tests/game.test.ts > AC2 – Edge placement and adjacency > should allow placing a ship adjacent diagonally
+ × tests/game.test.ts > AC3 – Invalid placement (overflow and overlap) > should reject ship placement that extends outside the board (unit)
+   → expected true to be false // Object.is equality
+ × tests/game.test.ts > AC3 – Invalid placement (overflow and overlap) > should throw when placeShip extends outside the board
+   → expected [Function] to throw an error
+ ✓ tests/game.test.ts > AC3 – Invalid placement (overflow and overlap) > should reject ship placement that overlaps an existing ship (unit)
+ ✓ tests/game.test.ts > AC3 – Invalid placement (overflow and overlap) > should throw when placeShip overlaps an existing ship
+ × tests/game.test.ts > AC3 – Invalid placement (overflow and overlap) > should return 400 via API when ship extends outside the board
+   → expected 200 to be 400 // Object.is equality
+ ✓ tests/game.test.ts > AC3 – Invalid placement (overflow and overlap) > should return 400 via API when ship overlaps an existing ship
+ ✓ tests/game.test.ts > AC4 – Shooting, bonus shot, and bot response > should grant bonus shot (no bot turn) when player HIT on first shot
+ ✓ tests/game.test.ts > AC4 – Shooting, bonus shot, and bot response > should end player turn after bonus shot and let bot respond
+ ✓ tests/game.test.ts > AC4 – Shooting, bonus shot, and bot response > should let bot respond immediately when player MISS on first shot
+ ✓ tests/game.test.ts > AC4 – Shooting, bonus shot, and bot response > should grant bonus after bonus-shot HIT too (chain does NOT happen — only 1 bonus)
+ ✓ tests/game.test.ts > AC5 – Last ship sunk, game over > should finish the game when the last bot cell is sunk and save to leaderboard
+ ✓ tests/game.test.ts > AC6 – Invalid shots (duplicate and out of bounds) > should return 400 when shooting at negative coordinates
+ ✓ tests/game.test.ts > AC6 – Invalid shots (duplicate and out of bounds) > should return 400 when shooting beyond the board (x=10)
+ ✓ tests/game.test.ts > AC6 – Invalid shots (duplicate and out of bounds) > should return 400 when shooting the same cell twice
+ ✓ tests/game.test.ts > AC6 – Invalid shots (duplicate and out of bounds) > should not change game state or trigger bot on invalid shot
+ ✓ tests/game.test.ts > AC7 – Phase violation > should return 400 when trying to shoot in PREPARE phase
+ ✓ tests/game.test.ts > AC7 – Phase violation > should return 400 when trying to shoot in FINISHED phase
+ ✓ tests/game.test.ts > AC7 – Phase violation > should return 400 when trying to place a ship in BATTLE phase
+ ✓ tests/game.test.ts > AC4 (determinism) – Seedable bot RNG > should generate an identical bot board for the same seed
+ ✓ tests/game.test.ts > AC4 (determinism) – Seedable bot RNG > should generate a different bot board for a different seed
+ ✓ tests/game.test.ts > AC4 (determinism) – Seedable bot RNG > should produce reproducible bot shots across two identically seeded games
+
+⎯⎯⎯ Failed Tests 3 ⎯⎯⎯
+ FAIL  tests/game.test.ts > AC3 – Invalid placement (overflow and overlap) > should reject ship placement that extends outside the board (unit)
+AssertionError: expected true to be false // Object.is equality
+- Expected
++ Received
+- false
++ true
+ ❯ tests/game.test.ts:179:30
+    177|     const board = createEmptyBoard();
+    178|     const validation = validateShipPlacement(board, 3, { x: 8, y: 0 }, 'horizontal');
+    179|     expect(validation.valid).toBe(false);
+       |                              ^
+    180|     expect(validation.error).toBeDefined();
+    181|   });
+
+ FAIL  tests/game.test.ts > AC3 – Invalid placement (overflow and overlap) > should throw when placeShip extends outside the board
+AssertionError: expected [Function] to throw an error
+ ❯ tests/game.test.ts:187:7
+    185|     expect(() =>
+    186|       placeShip(board, 'ship_3a', 3, { x: 8, y: 0 }, 'horizontal')
+    187|     ).toThrow();
+       |       ^
+
+ FAIL  tests/game.test.ts > AC3 – Invalid placement (overflow and overlap) > should return 400 via API when ship extends outside the board
+AssertionError: expected 200 to be 400 // Object.is equality
+- Expected
++ Received
+- 400
++ 200
+ ❯ tests/game.test.ts:222:29
+    220|       .send({ shipId: 'ship_3a', x: 8, y: 0, orientation: 'horizontal' });
+    221|
+    222|     expect(placeRes.status).toBe(400);
+       |                             ^
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 23 passed (26)
+   Start at  14:57:35
+   Duration  1.31s
